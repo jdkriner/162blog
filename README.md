@@ -1,29 +1,43 @@
-1 - We are now able to register users:
-- app.post('/register', (req, res)) will call registerUser(req, res) function.
-- registerUser checks if user exists, if not, it calls addUser()
-- add user generates time and creates a new user object. it also returns the new object but we are not doing anything with it.
+# Project Documentation
 
-2 - findUserByUsername and findUserById are used to find users in the users array.
+## 1. User Registration
 
-3 - the initial user array looks like this:
+We are now able to register users:
 
+- `POST /register`: This endpoint calls the `registerUser(req, res)` function.
+- The `registerUser` function checks if a user exists; if not, it calls `addUser()`.
+- The `addUser` function generates the current time and creates a new user object. It also returns the new object, but we are not doing anything with it currently.
+
+## 2. User Lookup
+
+- `findUserByUsername` and `findUserById` are used to find users in the users array.
+
+## 3. Initial Users Array
+
+The initial user array is defined as follows:
+
+```javascript
 let users = [
     { 
         id: 1,
         username: 'SampleUser',
         password: 'sss',
         avatar_url: undefined,
-        memberSince: '2024-01-01 08:00' },
+        memberSince: '2024-01-01 08:00' 
+    },
     { 
         id: 2,
         username: 'AnotherUser',
         password: 'sss',
         avatar_url: undefined,
-        memberSince: '2024-01-02 09:00' },
+        memberSince: '2024-01-02 09:00' 
+    },
 ];
+```
+## 4. User Addition Example
+When a user is added through registerUser, the array is updated as follows:
 
-4 - when a user is added through registerUser, it will look like this:
-
+```javascript
 [
   {
     id: 1,
@@ -48,11 +62,10 @@ let users = [
   },
   {
     id: 4,
-    username: 'ali',
+    username: 'Ali',
     password: 'Hassan',
     avatar_url: undefined,
     memberSince: '2024-05-16 20:19'
   }
 ]
-
-notice how date was generated in real time and trying to register users that already exist do not add them to this array nor increment the id incorrectly.
+```
