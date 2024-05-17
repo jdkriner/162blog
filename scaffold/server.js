@@ -139,13 +139,15 @@ app.get('/avatar/:username', (req, res) => {
 });
 app.post('/register', (req, res) => {
     // TODO: Register a new user
+    registerUser(req, res);
+    console.log('Registeration complete');
+    // TODO: delete code below
+    console.log(users);
 });
 app.post('/login', (req, res) => {
     // TODO: Login a user
-    //console.log(res);
-    console.log(req.body);
-    // getCurrectUser(req)
-    // res.redirect()
+    getCurrentUser(req);
+    res.redirect('/');
 });
 app.get('/logout', (req, res) => {
     // TODO: Logout the user
@@ -174,23 +176,59 @@ let posts = [
     { id: 2, title: 'Another Post', content: 'This is another sample post.', username: 'AnotherUser', timestamp: '2024-01-02 12:00', likes: 0 },
 ];
 let users = [
-    { id: 1, username: 'SampleUser', avatar_url: undefined, memberSince: '2024-01-01 08:00' },
-    { id: 2, username: 'AnotherUser', avatar_url: undefined, memberSince: '2024-01-02 09:00' },
+    { 
+        id: 1,
+        username: 'SampleUser',
+        password: 'sss',
+        avatar_url: undefined,
+        memberSince: '2024-01-01 08:00' },
+    { 
+        id: 2,
+        username: 'AnotherUser',
+        password: 'sss',
+        avatar_url: undefined,
+        memberSince: '2024-01-02 09:00' },
 ];
 
 // Function to find a user by username
 function findUserByUsername(username) {
     // TODO: Return user object if found, otherwise return undefined
+    return users.find((user) => {
+        return user.username === username
+    });
 }
 
 // Function to find a user by user ID
 function findUserById(userId) {
     // TODO: Return user object if found, otherwise return undefined
+    return users.find((user) => {
+        return user.id === userId;
+    });
 }
 
 // Function to add a new user
-function addUser(username) {
+function addUser(username, password) {
     // TODO: Create a new user object and add to users array
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+
+    const completeDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    // Find the highest current user ID and add 1 to it
+    let maxId = users.reduce((max, user) => Math.max(max, user.id), 0);
+    let newUser = {
+        id: maxId + 1,
+        username: username,
+        password: password,
+        avatar_url: undefined,
+        memberSince: completeDate
+    };
+
+    users.push(newUser);  // Add the new user to the array
+    return newUser;
 }
 
 // Middleware to check if user is authenticated
@@ -206,6 +244,17 @@ function isAuthenticated(req, res, next) {
 // Function to register a user
 function registerUser(req, res) {
     // TODO: Register a new user and redirect appropriately
+    const username = req.body.username;
+    const password = req.body.password;
+    console.log(`Creating account for: ${username}`);
+    // TODO: check if user has an account. 
+    // if yes, error, if no, add user and reducrect back to login
+    if(findUserByUsername(username)){
+        res.redirect('/register?error=Username+already+exists');
+    } else {
+        addUser(username, password);
+        res.redirect('/login');
+    }
 }
 
 // Function to login a user
@@ -236,8 +285,9 @@ function handleAvatar(req, res) {
 // Function to get the current user from session
 function getCurrentUser(req) {
     // TODO: Return the user object if the session user ID matches
-    // const {username, password} = req.body;
-    
+    const {username, password} = req.body;
+    console.log(`user is ${username}`);
+    console.log(`pass is ${password}`);
 }
 
 // Function to get all posts, sorted by latest first
