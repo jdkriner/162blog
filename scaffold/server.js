@@ -75,7 +75,7 @@ app.use(
 // should be used in your template files. 
 // 
 app.use((req, res, next) => {
-    res.locals.appName = 'MicroBlog';
+    res.locals.appName = 'ShareStuff';
     res.locals.copyrightYear = 2024;
     res.locals.postNeoType = 'Post';
     res.locals.loggedIn = req.session.loggedIn || false;
@@ -142,9 +142,15 @@ app.post('/register', (req, res) => {
 });
 app.post('/login', (req, res) => {
     // TODO: Login a user
+    //console.log(res);
+    console.log(req.body);
+    // getCurrectUser(req)
+    // res.redirect()
 });
 app.get('/logout', (req, res) => {
     // TODO: Logout the user
+    // req.session.loggedIn = false;
+    // res.redirect('/);
 });
 app.post('/delete/:id', isAuthenticated, (req, res) => {
     // TODO: Delete a post if the current user is the owner
@@ -230,6 +236,8 @@ function handleAvatar(req, res) {
 // Function to get the current user from session
 function getCurrentUser(req) {
     // TODO: Return the user object if the session user ID matches
+    // const {username, password} = req.body;
+    
 }
 
 // Function to get all posts, sorted by latest first
