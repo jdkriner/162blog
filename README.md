@@ -69,3 +69,112 @@ When a user is added through registerUser, the array is updated as follows:
   }
 ]
 ```
+## 5. Loggin in a user
+following function will log the user in
+```javascript
+app.post('/login', (req, res) => {
+    // TODO: Login a user
+    loginUser(req, res);
+});
+
+function loginUser(req, res) {
+    // TODO: Login a user and redirect appropriately
+    const {username, password} = req.body;
+    const user = findUserByUsername(username);
+    if (user && user.password === password){
+        req.session.userId = user.id;
+        req.session.loggedIn = true;
+        res.redirect('/');
+    } else {
+        res.redirect('/login?error=Invalid+credentials');
+    }
+}
+```
+## 6. Log out a user
+```javascript
+app.get('/logout', (req, res) => {
+    // TODO: Logout the user
+    logoutUser(req, res);
+});
+
+function logoutUser(req, res) {
+    // TODO: Destroy session and redirect appropriately
+    req.session.destroy(() => {
+        res.redirect('/');
+    })
+}
+```
+## 7. Rendering a profile
+```javascript
+app.get('/profile', isAuthenticated, (req, res) => {
+    // TODO: Render profile page
+    renderProfile(req, res);
+});
+
+function renderProfile(req, res) {
+    // TODO: Fetch user posts and render the profile page
+    const user = findUserById(req.session.userId);
+    if (user) {
+        // filter creates a new array with elements that pass
+        // a criteria
+        const userPosts = posts.filter(posts => posts.username === user.username);
+        res.render('profile', {user, posts: userPosts});
+    } else {
+        res.redirect('/login');
+    }
+}
+```
+## 8. Generate Avatar
+```javascript
+app.get('/avatar/:username', (req, res) => {
+    // TODO: Serve the avatar image for the user
+    const user = findUserByUsername(req.params.username);
+    if(user){
+        const firstLetter = user.username[0].toUpperCase();
+        const avatar = generateAvatar(firstLetter);
+        res.type('png').send(avatar);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+function generateAvatar(letter, width = 100, height = 100) {
+    const { createCanvas } = require('canvas');
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#0D47A1';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '45px Arial';
+    ctx.fillText(letter, width / 3, height / 1.5);
+    return canvas.toBuffer();
+}
+```
+## 8. Create Posts
+```javascript
+app.post('/posts', (req, res) => {
+    // TODO: Add a new post and redirect to home
+    const {title, content} = req.body;
+    const user = findUserById(req.session.userId);
+    if(user){
+        addPost(title, content, user);
+        res.redirect('/');
+    } else {
+        res.status(403).send('You must be logged in to post.');
+    }
+});
+
+function addPost(title, content, user) {
+    // TODO: Create a new post object and add to posts array
+    const newPost = {
+        id: posts.length + 1,
+        title,
+        content,
+        username: user.username,
+        timestamp: calculateDate(),
+        likes: 0
+    };
+    posts.push(newPost);
+}
+```

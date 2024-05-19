@@ -127,15 +127,32 @@ app.get('/post/:id', (req, res) => {
 });
 app.post('/posts', (req, res) => {
     // TODO: Add a new post and redirect to home
+    const {title, content} = req.body;
+    const user = findUserById(req.session.userId);
+    if(user){
+        addPost(title, content, user);
+        res.redirect('/');
+    } else {
+        res.status(403).send('You must be logged in to post.');
+    }
 });
 app.post('/like/:id', (req, res) => {
     // TODO: Update post likes
 });
 app.get('/profile', isAuthenticated, (req, res) => {
     // TODO: Render profile page
+    renderProfile(req, res);
 });
 app.get('/avatar/:username', (req, res) => {
     // TODO: Serve the avatar image for the user
+    const user = findUserByUsername(req.params.username);
+    if(user){
+        const firstLetter = user.username[0].toUpperCase();
+        const avatar = generateAvatar(firstLetter);
+        res.type('png').send(avatar);
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 app.post('/register', (req, res) => {
     // TODO: Register a new user
@@ -146,13 +163,11 @@ app.post('/register', (req, res) => {
 });
 app.post('/login', (req, res) => {
     // TODO: Login a user
-    getCurrentUser(req);
-    res.redirect('/');
+    loginUser(req, res);
 });
 app.get('/logout', (req, res) => {
     // TODO: Logout the user
-    // req.session.loggedIn = false;
-    // res.redirect('/);
+    logoutUser(req, res);
 });
 app.post('/delete/:id', isAuthenticated, (req, res) => {
     // TODO: Delete a post if the current user is the owner
@@ -206,9 +221,7 @@ function findUserById(userId) {
     });
 }
 
-// Function to add a new user
-function addUser(username, password) {
-    // TODO: Create a new user object and add to users array
+function calculateDate(){
     const now = new Date();
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -216,7 +229,13 @@ function addUser(username, password) {
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
 
-    const completeDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+// Function to add a new user
+function addUser(username, password) {
+    // TODO: Create a new user object and add to users array
+    const completeDate = calculateDate();
     // Find the highest current user ID and add 1 to it
     let maxId = users.reduce((max, user) => Math.max(max, user.id), 0);
     let newUser = {
@@ -260,16 +279,37 @@ function registerUser(req, res) {
 // Function to login a user
 function loginUser(req, res) {
     // TODO: Login a user and redirect appropriately
+    const {username, password} = req.body;
+    const user = findUserByUsername(username);
+    if (user && user.password === password){
+        req.session.userId = user.id;
+        req.session.loggedIn = true;
+        res.redirect('/');
+    } else {
+        res.redirect('/login?error=Invalid+credentials');
+    }
 }
 
 // Function to logout a user
 function logoutUser(req, res) {
     // TODO: Destroy session and redirect appropriately
+    req.session.destroy(() => {
+        res.redirect('/');
+    })
 }
 
 // Function to render the profile page
 function renderProfile(req, res) {
     // TODO: Fetch user posts and render the profile page
+    const user = findUserById(req.session.userId);
+    if (user) {
+        // filter creates a new array with elements that pass
+        // a criteria
+        const userPosts = posts.filter(posts => posts.username === user.username);
+        res.render('profile', {user, posts: userPosts});
+    } else {
+        res.redirect('/login');
+    }
 }
 
 // Function to update post likes
@@ -286,8 +326,6 @@ function handleAvatar(req, res) {
 function getCurrentUser(req) {
     // TODO: Return the user object if the session user ID matches
     const {username, password} = req.body;
-    console.log(`user is ${username}`);
-    console.log(`pass is ${password}`);
 }
 
 // Function to get all posts, sorted by latest first
@@ -298,6 +336,15 @@ function getPosts() {
 // Function to add a new post
 function addPost(title, content, user) {
     // TODO: Create a new post object and add to posts array
+    const newPost = {
+        id: posts.length + 1,
+        title,
+        content,
+        username: user.username,
+        timestamp: calculateDate(),
+        likes: 0
+    };
+    posts.push(newPost);
 }
 
 // Function to generate an image avatar
@@ -309,4 +356,14 @@ function generateAvatar(letter, width = 100, height = 100) {
     // 3. Draw the background color
     // 4. Draw the letter in the center
     // 5. Return the avatar as a PNG buffer
+    const { createCanvas } = require('canvas');
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#0D47A1';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '45px Arial';
+    ctx.fillText(letter, width / 3, height / 1.5);
+    return canvas.toBuffer();
 }
