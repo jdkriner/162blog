@@ -229,3 +229,6 @@ function updatePostLikes(req, res) {
     res.json({ success: true, likes: post.likes });
 }
 ```
+
+## 11. Resources
+logo image: https://www.rawpixel.com/image/10164402/png-white-background-paper

@@ -2,7 +2,7 @@ const express = require('express');
 const expressHandlebars = require('express-handlebars');
 const session = require('express-session');
 const canvas = require('canvas');
-
+const fs = require('fs');
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Configuration and Setup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,10 +151,15 @@ app.get('/avatar/:username', (req, res) => {
     if(user){
         const firstLetter = user.username[0].toUpperCase();
         const avatar = generateAvatar(firstLetter);
+        user.avatar_url = `${__dirname}/public/images/${req.params.username}.png`;
+        fs.writeFileSync(user.avatar_url, avatar);
+        //console.log(user.avatar_url);
         res.type('png').send(avatar);
     } else {
         res.status(404).send('User not found');
     }
+    // save the image
+    // const path = `${__dirname}/public${avatar}`
 });
 app.post('/register', (req, res) => {
     // TODO: Register a new user
