@@ -15,13 +15,15 @@
             <!-- everything that is shown in the status bar -->
             <!-- Heart = ♥ -->
             <!-- font awesome  trashcan = <i class="fas fa-trash-alt"> </i>-->
-            <div id="likes-count-{{id}}">Likes: {{likes}} ♥</div>
+            <div class="likes-counter" id="likes-count-{{id}}">Likes: {{likes}} ♥</div>
             {{#if userCanEdit}}
                 <button onclick="handleDeleteClick(event)" class="delete-button" data-id="{{id}}">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             {{/if}}
-            <button onclick="handleLikeClick(event)" class="like-button" data-id="{{id}}">Like</button>
+            <button onclick="handleLikeClick(event)" class="like-button" data-id="{{id}}">
+                <i class="fas fa-thumbs-up"></i> Like
+            </button>
         </div>        
     </div>
 </div>
