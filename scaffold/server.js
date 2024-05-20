@@ -138,37 +138,7 @@ app.post('/posts', (req, res) => {
 });
 
 app.post('/like/:id', (req, res) => {
-    const postId = parseInt(req.params.id);
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res.status(403).json({ success: false, message: "You must be logged in to like posts." });
-    }
-
-    const post = posts.find(p => p.id === postId);
-    if (!post) {
-        return res.status(404).json({ success: false, message: "Post not found" });
-    }
-
-    if (post.id === req.session.userId) {
-        //return res.status(400).json({ success: false, message: "You cannot like your own post" });
-        console.log(`User ${userId} tried to like their own post`);
-        return res.end();
-    }
-
-    // Check if the user has already liked the post
-    const likeIndex = likes.findIndex(like => like.userId === userId && like.postId === postId);
-    if (likeIndex !== -1) {
-        // User has liked the post, so unlike it
-        likes.splice(likeIndex, 1); // Remove the like from the array
-        post.likes -= 1; // Decrement the likes count
-    } else {
-        // User has not liked the post, so like it
-        likes.push({ userId: userId, postId: postId }); // Add new like
-        post.likes += 1; // Increment the likes count
-    }
-    console.log(likes);
-    res.json({ success: true, likes: post.likes });
+    updatePostLikes(req, res);
 });
 
 app.get('/profile', isAuthenticated, (req, res) => {
@@ -349,6 +319,37 @@ function renderProfile(req, res) {
 // Function to update post likes
 function updatePostLikes(req, res) {
     // TODO: Increment post likes if conditions are met
+    const postId = parseInt(req.params.id);
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(403).json({ success: false, message: "You must be logged in to like posts." });
+    }
+
+    const post = posts.find(p => p.id === postId);
+    if (!post) {
+        return res.status(404).json({ success: false, message: "Post not found" });
+    }
+
+    if (post.id === req.session.userId) {
+        //return res.status(400).json({ success: false, message: "You cannot like your own post" });
+        console.log(`User ${userId} tried to like their own post`);
+        return res.end();
+    }
+
+    // Check if the user has already liked the post
+    const likeIndex = likes.findIndex(like => like.userId === userId && like.postId === postId);
+    if (likeIndex !== -1) {
+        // User has liked the post, so unlike it
+        likes.splice(likeIndex, 1); // Remove the like from the array
+        post.likes -= 1; // Decrement the likes count
+    } else {
+        // User has not liked the post, so like it
+        likes.push({ userId: userId, postId: postId }); // Add new like
+        post.likes += 1; // Increment the likes count
+    }
+    console.log(likes);
+    res.json({ success: true, likes: post.likes });
 }
 
 // Function to handle avatar generation and serving
