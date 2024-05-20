@@ -136,9 +136,41 @@ app.post('/posts', (req, res) => {
         res.status(403).send('You must be logged in to post.');
     }
 });
+
 app.post('/like/:id', (req, res) => {
-    // TODO: Update post likes
+    const postId = parseInt(req.params.id);
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(403).json({ success: false, message: "You must be logged in to like posts." });
+    }
+
+    const post = posts.find(p => p.id === postId);
+    if (!post) {
+        return res.status(404).json({ success: false, message: "Post not found" });
+    }
+
+    if (post.id === req.session.userId) {
+        //return res.status(400).json({ success: false, message: "You cannot like your own post" });
+        console.log(`User ${userId} tried to like their own post`);
+        return res.end();
+    }
+
+    // Check if the user has already liked the post
+    const likeIndex = likes.findIndex(like => like.userId === userId && like.postId === postId);
+    if (likeIndex !== -1) {
+        // User has liked the post, so unlike it
+        likes.splice(likeIndex, 1); // Remove the like from the array
+        post.likes -= 1; // Decrement the likes count
+    } else {
+        // User has not liked the post, so like it
+        likes.push({ userId: userId, postId: postId }); // Add new like
+        post.likes += 1; // Increment the likes count
+    }
+    console.log(likes);
+    res.json({ success: true, likes: post.likes });
 });
+
 app.get('/profile', isAuthenticated, (req, res) => {
     // TODO: Render profile page
     renderProfile(req, res);
@@ -204,6 +236,7 @@ let users = [
         avatar_url: undefined,
         memberSince: '2024-01-02 09:00' },
 ];
+let likes = [];
 
 // Function to find a user by username
 function findUserByUsername(username) {
@@ -305,8 +338,9 @@ function renderProfile(req, res) {
     if (user) {
         // filter creates a new array with elements that pass
         // a criteria
-        const userPosts = posts.filter(posts => posts.username === user.username);
-        res.render('profile', {user, posts: userPosts});
+        const userPosts = posts.filter(post => post.username === user.username);
+        console.log(userPosts);
+        res.render('profile', { user, posts: userPosts, postNeoType: 'Post', userCanEdit: user.id === req.session.userId });
     } else {
         res.redirect('/login');
     }
@@ -345,6 +379,7 @@ function addPost(title, content, user) {
         likes: 0
     };
     posts.push(newPost);
+    console.log(posts);
 }
 
 // Function to generate an image avatar

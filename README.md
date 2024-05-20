@@ -107,7 +107,6 @@ function logoutUser(req, res) {
 ## 7. Rendering a profile
 ```javascript
 app.get('/profile', isAuthenticated, (req, res) => {
-    // TODO: Render profile page
     renderProfile(req, res);
 });
 
@@ -117,8 +116,9 @@ function renderProfile(req, res) {
     if (user) {
         // filter creates a new array with elements that pass
         // a criteria
-        const userPosts = posts.filter(posts => posts.username === user.username);
-        res.render('profile', {user, posts: userPosts});
+        const userPosts = posts.filter(post => post.username === user.username);
+        console.log(userPosts);
+        res.render('profile', { user, posts: userPosts, postNeoType: 'Post', userCanEdit: user.id === req.session.userId });
     } else {
         res.redirect('/login');
     }

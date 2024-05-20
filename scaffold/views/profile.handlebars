@@ -20,9 +20,9 @@
     <h2>Your {{{postNeoType}}}s</h2>
     
     <!-- you'll need to make this conditaionl and #each expression work -->
-    {{#if user.posts.length}}
+    {{#if posts.length}}
         <ul>
-            {{#each user.posts}}
+            {{#each posts}}
                 {{> post this}}
             {{/each}}
         </ul>
