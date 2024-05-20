@@ -1,5 +1,13 @@
 # Project Documentation
 
+## Usage:
+```console
+> git clone https://github.com/jdkriner/162blog.git
+> cd 162blog/scaffold
+> npm install
+> node server.js
+```
+
 ## 1. User Registration
 
 We are now able to register users:
@@ -151,7 +159,7 @@ function generateAvatar(letter, width = 100, height = 100) {
     return canvas.toBuffer();
 }
 ```
-## 8. Create Posts
+## 9. Create Posts
 ```javascript
 app.post('/posts', (req, res) => {
     // TODO: Add a new post and redirect to home
@@ -179,7 +187,7 @@ function addPost(title, content, user) {
 }
 ```
 
-## 9. Updating Likes
+## 10. Updating Likes
 Users are not allowed to like their own posts and if they like a post they have already liked, their like will be removed.
 ```javascript
 app.post('/like/:id', (req, res) => {
