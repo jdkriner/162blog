@@ -173,6 +173,16 @@ app.get('/logout', (req, res) => {
 });
 app.post('/delete/:id', isAuthenticated, (req, res) => {
     // TODO: Delete a post if the current user is the owner
+    const postId = parseInt(req.params.id);
+    const userId = req.session.userId; 
+    const postIndex = posts.findIndex(p => p.id === postId && p.userId === userId);
+    if (postIndex === -1) {
+        return res.status(404).json({ message: "Post not found or user not authorized to delete this post" });
+    }
+
+    posts.splice(postIndex, 1);
+
+    res.status(200).json({ message: "Post deleted successfully" });
 });
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -308,9 +318,12 @@ function renderProfile(req, res) {
     if (user) {
         // filter creates a new array with elements that pass
         // a criteria
-        const userPosts = posts.filter(post => post.username === user.username);
+        const userPosts = posts.filter(post => post.username === user.username).map(post => ({
+            ...post,
+            userCanEdit: post.username === user.username
+        }));
         console.log(userPosts);
-        res.render('profile', { user, posts: userPosts, postNeoType: 'Post', userCanEdit: user.id === req.session.userId });
+        res.render('profile', { user, posts: userPosts, postNeoType: 'Post'});
     } else {
         res.redirect('/login');
     }
@@ -331,7 +344,7 @@ function updatePostLikes(req, res) {
         return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    if (post.id === req.session.userId) {
+    if (post.userId === req.session.userId) {
         //return res.status(400).json({ success: false, message: "You cannot like your own post" });
         console.log(`User ${userId} tried to like their own post`);
         return res.end();
@@ -376,6 +389,7 @@ function addPost(title, content, user) {
         title,
         content,
         username: user.username,
+        userId: user.id,
         timestamp: calculateDate(),
         likes: 0
     };
