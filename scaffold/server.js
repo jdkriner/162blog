@@ -176,7 +176,7 @@ app.post('/register', (req, res) => {
     registerUser(req, res);
     console.log('Registeration complete');
     // TODO: delete code below
-    console.log(users);
+    // console.log(users);
 });
 app.post('/login', (req, res) => {
     // TODO: Login a user
@@ -328,6 +328,7 @@ function loginUser(req, res) {
     if (user && user.password === password){
         req.session.userId = user.id;
         req.session.loggedIn = true;
+        console.log(`${username} logged in at ${calculateDate()}`);
         res.redirect('/');
     } else {
         res.redirect('/login?error=Invalid+credentials');

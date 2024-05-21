@@ -27,18 +27,18 @@ The initial user array is defined as follows:
 ```javascript
 let users = [
     { 
-        id: 1,
-        username: 'SampleUser',
-        password: 'sss',
-        avatar_url: undefined,
-        memberSince: '2024-01-01 08:00' 
+        id:             1,
+        username:       'SampleUser',
+        password:       'sss',
+        avatar_url:     '/images/SampleUser.png',
+        memberSince:    '2024-01-01 08:00' 
     },
     { 
-        id: 2,
-        username: 'AnotherUser',
-        password: 'sss',
-        avatar_url: undefined,
-        memberSince: '2024-01-02 09:00' 
+        id:             2,
+        username:       'AnotherUser',
+        password:       'sss',
+        avatar_url:     '/images/AnotherUser.png',
+        memberSince:    '2024-01-02 09:00' 
     },
 ];
 ```
@@ -47,34 +47,34 @@ When a user is added through registerUser, the array is updated as follows:
 
 ```javascript
 [
-  {
-    id: 1,
-    username: 'SampleUser',
-    password: 'sss',
-    avatar_url: undefined,
-    memberSince: '2024-01-01 08:00'
-  },
-  {
-    id: 2,
-    username: 'AnotherUser',
-    password: 'sss',
-    avatar_url: undefined,
-    memberSince: '2024-01-02 09:00'
-  },
-  {
-    id: 3,
-    username: 'Hassan',
-    password: 'Ali1',
-    avatar_url: undefined,
-    memberSince: '2024-05-16 20:19'
-  },
-  {
-    id: 4,
-    username: 'Ali',
-    password: 'Hassan',
-    avatar_url: undefined,
-    memberSince: '2024-05-16 20:19'
-  }
+    { 
+        id:             1,
+        username:       'SampleUser',
+        password:       'sss',
+        avatar_url:     '/images/SampleUser.png',
+        memberSince:    '2024-01-01 08:00' 
+    },
+    { 
+        id:             2,
+        username:       'AnotherUser',
+        password:       'sss',
+        avatar_url:     '/images/AnotherUser.png',
+        memberSince:    '2024-01-02 09:00' 
+    },
+    {
+        id: 3,
+        username: 'Hassan',
+        password: 'Ali1',
+        avatar_url: '/images/Hassan.png',
+        memberSince: '2024-05-16 20:19'
+    },
+    {
+        id: 4,
+        username: 'Ali',
+        password: 'Hassan',
+        avatar_url: '/images/Ali.png',
+        memberSince: '2024-05-16 20:19'
+    }
 ]
 ```
 ## 5. Loggin in a user
@@ -92,6 +92,7 @@ function loginUser(req, res) {
     if (user && user.password === password){
         req.session.userId = user.id;
         req.session.loggedIn = true;
+        console.log(`${username} logged in at ${calculateDate()}`);
         res.redirect('/');
     } else {
         res.redirect('/login?error=Invalid+credentials');
@@ -124,9 +125,12 @@ function renderProfile(req, res) {
     if (user) {
         // filter creates a new array with elements that pass
         // a criteria
-        const userPosts = posts.filter(post => post.username === user.username);
+        const userPosts = posts.filter(post => post.username === user.username).map(post => ({
+            ...post,
+            userCanEdit: post.username === user.username
+        }));
         console.log(userPosts);
-        res.render('profile', { user, posts: userPosts, postNeoType: 'Post', userCanEdit: user.id === req.session.userId });
+        res.render('profile', { user, posts: userPosts, postNeoType: 'Post'});
     } else {
         res.redirect('/login');
     }
@@ -140,18 +144,24 @@ app.get('/avatar/:username', (req, res) => {
     if(user){
         const firstLetter = user.username[0].toUpperCase();
         const avatar = generateAvatar(firstLetter);
+        user.avatar_url = `${__dirname}/public/images/${req.params.username}.png`;
+        fs.writeFileSync(user.avatar_url, avatar);
+        //console.log(user.avatar_url);
         res.type('png').send(avatar);
     } else {
         res.status(404).send('User not found');
     }
+    // save the image
+    // const path = `${__dirname}/public${avatar}`
 });
 
 function generateAvatar(letter, width = 100, height = 100) {
+    // TODO: Generate an avatar image with a letter
     const { createCanvas } = require('canvas');
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#0D47A1';
+    ctx.fillStyle = '#FF0000';
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = '#fff';
     ctx.font = '45px Arial';
@@ -180,10 +190,12 @@ function addPost(title, content, user) {
         title,
         content,
         username: user.username,
+        userId: user.id,
         timestamp: calculateDate(),
         likes: 0
     };
     posts.push(newPost);
+    console.log(posts);
 }
 ```
 
@@ -208,7 +220,7 @@ function updatePostLikes(req, res) {
         return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    if (post.id === req.session.userId) {
+    if (post.userId === req.session.userId) {
         //return res.status(400).json({ success: false, message: "You cannot like your own post" });
         console.log(`User ${userId} tried to like their own post`);
         return res.end();
@@ -232,3 +244,4 @@ function updatePostLikes(req, res) {
 
 ## 11. Resources
 logo image: https://www.rawpixel.com/image/10164402/png-white-background-paper
+Default image: license attached in image folder
