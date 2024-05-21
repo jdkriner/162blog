@@ -4,7 +4,7 @@
 <div class="profile-container">
     <div class="profile-avatar">
         <!-- Correct path for the default avatar image -->
-        <img src="{{#if user.avatar_url}}{{user.avatar_url}}{{else}}/path/to/default/avatar.jpg{{/if}}" alt="Profile Avatar">
+        <img src="{{#if user.avatar_url}}/avatar/{{user.username}}{{else}}/avatar/{{user.username}}{{/if}}" alt="Profile Avatar">
     </div>
     
     <section class="profile-info">

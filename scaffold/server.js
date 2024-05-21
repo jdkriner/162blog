@@ -431,7 +431,7 @@ function generateAvatar(letter, width = 100, height = 100) {
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#0D47A1';
+    ctx.fillStyle = '#FF0000';
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = '#fff';
     ctx.font = '45px Arial';

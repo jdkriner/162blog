@@ -30,28 +30,28 @@
 <script>
 
     function handleLikeClick(event) {
-    const button = event.target;
-    const postId = button.getAttribute('data-id');
+        const button = event.target;
+        const postId = button.getAttribute('data-id');
 
-    fetch(`/like/${postId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Find and update the likes count element
-                const likesCountElement = document.querySelector(`#likes-count-${postId}`);
-                if (likesCountElement) {
-                    likesCountElement.textContent = `Likes: ${data.likes} ♥`;
+        fetch(`/like/${postId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Find and update the likes count element
+                    const likesCountElement = document.querySelector(`#likes-count-${postId}`);
+                    if (likesCountElement) {
+                        likesCountElement.textContent = `Likes: ${data.likes} ♥`;
+                    }
+                    button.classList.toggle('liked');
+                } else {
+                    // alert(data.message); // Show error message from server
                 }
-                button.classList.toggle('liked');
-            } else {
-                // alert(data.message); // Show error message from server
-            }
-        })
-        .catch(error => {
-            console.error('Error liking the post:', error);
-            // alert('Could not process your like. Please try again.');
-        });
-    }
+            })
+            .catch(error => {
+                console.error('Error liking the post:', error);
+                // alert('Could not process your like. Please try again.');
+            });
+        }
 
     function handleDeleteClick(event) {
         const buttonElement = event.target.closest('.delete-button');
