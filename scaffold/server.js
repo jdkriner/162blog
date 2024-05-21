@@ -80,6 +80,16 @@ app.use((req, res, next) => {
     res.locals.postNeoType = 'Post';
     res.locals.loggedIn = req.session.loggedIn || false;
     res.locals.userId = req.session.userId || '';
+
+    // If the user is logged in, fetch additional details
+    if (res.locals.loggedIn && res.locals.userId) {
+        const user = findUserById(res.locals.userId); // This function needs to be defined to fetch user data
+        if (user) {
+            res.locals.username = user.username;
+            res.locals.avatar_url = user.avatar_url || '/images/default.png'; // Provide a default if none is set
+        }
+    }
+
     next();
 });
 
@@ -228,13 +238,13 @@ let users = [
         id:             1,
         username:       'SampleUser',
         password:       'sss',
-        avatar_url:     undefined,
+        avatar_url:     '/images/SampleUser.png',
         memberSince:    '2024-01-01 08:00' },
     { 
         id:             2,
         username:       'AnotherUser',
         password:       'sss',
-        avatar_url:     undefined,
+        avatar_url:     '/images/AnotherUser.png',
         memberSince:    '2024-01-02 09:00' },
 ];
 let likes = [];
@@ -251,7 +261,7 @@ function findUserByUsername(username) {
 function findUserById(userId) {
     // TODO: Return user object if found, otherwise return undefined
     return users.find((user) => {
-        return user.id === userId;
+        return user.id === parseInt(userId);
     });
 }
 

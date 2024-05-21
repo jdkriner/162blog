@@ -1,7 +1,6 @@
-* {
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 }
 
 body {
@@ -11,6 +10,13 @@ body {
     background-color: #f4f4f4;
     padding: 20px;
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1;
 }
 
 footer {
@@ -68,26 +74,33 @@ nav ul {
 nav ul li {
     padding: 10px 15px;
     list-style-type: none;
+    background-color: #007BFF; 
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-right: 10px; 
+    transition: background-color 0.3s ease;
 }
 
 nav ul li a {
     color: #fff;
     text-decoration: none;
-    transition: color 0.3s ease; 
+    transition: color 0.3s ease;
+    display: block; 
 }
 
-nav ul li a:hover {
-    color: #ccefff;
-}
-
-nav ul li a:focus {
-    outline: none;
+nav ul li:hover {
     background-color: #0056b3;
+    cursor: pointer; 
+}
+
+nav ul li:hover a {
+    color: #ccefff;
 }
 
 .user-info {
     display: flex;
     align-items: center;
+    margin-left: auto;
 }
 
 .user-info img {
@@ -108,24 +121,22 @@ nav ul li a:focus {
         padding: 10px 0;
     }
 
-    nav ul {
-        flex-direction: column;
-    }
-
     nav ul li {
         padding: 5px;
+        margin-right: 0;
     }
-    
+
     .user-info img {
-        align-items: center;
-        left: 10;
+        alignments: center;
+    }
+
+    .avatar-img {
+        justify-content: center;
+        width: 100%;
     }
 }
 
 
-nav ul li a:hover, nav ul li a:focus {
-    background-color: #0056b3;
-}
 
 /* posts.handlebars  */
 
