@@ -64,7 +64,7 @@ function toggleEmojiPanel() {
 
     if(container.style.display === 'block' && allEmojis.length == 0){
         // go "Fetch" you some emojis and show them off with displayEmojies
-        fetch('https://emoji-api.com/emojis?access_key=1e02a4561ed07b5b74ad0a92051aa6096eb829da') 
+        fetch('https://emoji-api.com/emojis?access_key=') 
         .then(response => response.json())
         .then(data => {
             allEmojis = data; // assuming the data is in the format you expect
